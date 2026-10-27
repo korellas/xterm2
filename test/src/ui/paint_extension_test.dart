@@ -10,7 +10,7 @@ void main() {
       (tester) async {
     final terminal = Terminal()
       ..resize(4, 2)
-      ..write('\x1b[?25l\x1b[41m\u2588 ');
+      ..write('\x1b[?25l\x1b[41m\u2588  ');
     final key = GlobalKey();
     TerminalPaintContext? frame;
     final phases = <String>[];
@@ -24,12 +24,14 @@ void main() {
           },
           beforeCellForegrounds: (context) {
             phases.add('foreground');
-            context.canvas.drawRect(context.cellOffset(0, 0) & context.cellSize,
+            context.canvas.drawRect(
+                context.cellOffset(0, 0) &
+                    Size(context.cellSize.width * 2, context.cellSize.height),
                 Paint()..color = const Color(0xff00ff00));
           },
           afterCellForegrounds: (context) {
             phases.add('after');
-            context.canvas.drawRect(context.cellOffset(2, 0) & context.cellSize,
+            context.canvas.drawRect(context.cellOffset(3, 0) & context.cellSize,
                 Paint()..color = const Color(0xffffff00));
           },
         ));
@@ -41,10 +43,14 @@ void main() {
     expect(
         await _pixel(
             tester, image, (cell.width * 1.5).floor(), cell.height ~/ 2),
-        TerminalThemes.whiteOnBlack.red);
+        const Color(0xff00ff00));
     expect(
         await _pixel(
             tester, image, (cell.width * 2.5).floor(), cell.height ~/ 2),
+        TerminalThemes.whiteOnBlack.red);
+    expect(
+        await _pixel(
+            tester, image, (cell.width * 3.5).floor(), cell.height ~/ 2),
         const Color(0xffffff00));
     expect(
         await _pixel(
